@@ -1,0 +1,81 @@
+<div id="app">
+    <h1>{{message}}</h1>
+
+    <input v-model="newTodoText" type="text">
+    <button @click="addTodo(newTodoText)">Add todo</button>
+    <ul v-for="todo in todos" :key="todo.id">
+        <li>{{todo.text}} : {{checkComplete(todo.complete)}}</li>
+        <input v-if="todo.showEdit" v-model="editTodoText" type="text">
+        <button v-if="todo.showEdit" @click="editTodo(todo.id, editTodoText)">Done</button>
+        <button v-if="!todo.complete && !todo.showEdit" @click="completeTodo(todo.id)">Complete</button>
+        <button v-if="!todo.showEdit" @click="openEdit(todo.id)">Edit</button>
+        <button v-if="!todo.showEdit" @click="deleteTodo(todo.id)">Delete</button>
+    </ul>
+</div>
+
+<script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    let id = 0;
+
+    createApp({
+        data() {
+            return {
+                message: 'Todos List',
+                newTodoText: '',
+                editTodoText: '',
+                todos: [
+                    {id: id++, text: 'do homework', complete: false, showEdit: false},
+                    {id: id++, text: 'do grades', complete: false, showEdit: false},
+                    {id: id++, text: 'clean house', complete: false, showEdit: false}
+                ]
+            }
+        },
+        methods: {
+            addTodo(newTodoText) {
+                this.todos.push(
+                    {id: this.todos.length, text: newTodoText, complete: false, showEdit: false}
+                )
+                this.clearInput()
+            },
+            completeTodo(id) {
+                this.todos[id].complete = true;
+            },
+            deleteTodo(id) {
+                this.todos.splice(id, 1);
+                this.reassignIDs();
+            },
+            reassignIDs() {
+                for(let i = 0; i < this.todos.length; i++) {
+                    this.todos[i].id = i;
+                }
+            },
+            openEdit(id) {
+                for(let i = 0; i < this.todos.length; i++) {
+                    if(i == id) {
+                        this.todos[id].showEdit = true;
+                    }
+                    else {
+                        this.todos[i].showEdit = false;
+                    }
+                }
+            },
+            editTodo(id, editTodoText) {
+                this.todos[id].text = editTodoText;
+                this.editTodoText = '';
+                this.todos[id].showEdit = false;
+            },
+            clearInput() {
+                this.newTodoText = "";
+            },
+            checkComplete(todoComplete) {
+                if(todoComplete) {
+                    return 'Complete'
+                }
+                else {
+                    return 'Incomplete'
+                }
+            }
+        }
+    }).mount('#app')
+</script>
